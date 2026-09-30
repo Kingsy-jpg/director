@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F5F0E6">
+<title>人生如戏，你将如何导演？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  html, body { margin: 0; padding: 0; }
+
+  :root {
+    --paper: #F5F0E6;
+    --card: #FBF8F0;
+    --ticket: #F0E8D0;
+    --ink: #1A1A1A;
+    --ink-soft: #3A3226;
+    --ink-mute: #7A6E5C;
+    --red: #C0392B;
+    --line: #D0C6B0;
+
+    --theme-bg: #0A0A0F;
+    --theme-accent: #E85A4A;
+    --theme-glow: rgba(232, 90, 74, 0.45);
+    --theme-fill: rgba(232, 90, 74, 0.22);
+    --theme-spot: rgba(255, 220, 160, 0.20);
+    --theme-btn-text: #FFF5EC;
+
+    --cinema-ink: #F5F0E6;
+    --cinema-ink-soft: rgba(240, 230, 200, 0.78);
+    --cinema-ink-mute: rgba(240, 230, 200, 0.5);
+  }
+
+  body {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(rgba(60, 50, 40, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(60, 50, 40, 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.9s ease;
+  }
+
+  .hand {
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    font-weight: 400;
+  }
+  .serif {
+    font-family: 'Songti SC', 'STSong', 'Noto Serif SC', 'SimSun', serif;
+    font-weight: 700;
+  }
+  .mono { font-family: 'Courier New', Courier, monospace; }
+
+  /* 黑屏转场遮罩 */
+  .transition-mask {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.32s ease;
+  }
+  .transition-mask.on {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 放映厅环境层 */
+  .cinema-env {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.1s ease;
+  }
+  body.on-result .cinema-env { opacity: 1; }
+
+  .cinema-env::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--theme-bg);
+    background-image:
+      radial-gradient(ellipse 90% 60% at 50% -8%, var(--theme-spot), transparent 62%),
+      radial-gradient(ellipse 70% 50% at 50% 108%, var(--theme-glow), transparent 68%),
+      radial-gradient(ellipse 50% 30% at 15% 40%, var(--theme-spot), transparent 70%),
+      radial-gradient(ellipse 50% 30% at 85% 60%, var(--theme-spot), transparent 70%);
+    transition: background-color 0.9s ease, background-image 0.9s ease;
+  }
+
+  .spotlight {
+    position: absolute;
+    top: -30vh;
+    left: 50%;
+    width: 160vw;
+    height: 90vh;
+    background: radial-gradient(
+      ellipse 42% 90% at 50% 0%,
+      var(--theme-spot) 0%,
+      transparent 72%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.25);
+    transition: background 0.9s ease;
+  }
+  body.on-result .spotlight {
+    animation: spotExpand 1s cubic-bezier(0.22, 0.68, 0.32, 1) 0.35s both,
+               spotBreathe 6s ease-in-out 1.5s infinite;
+  }
+  @keyframes spotExpand {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.25); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
+  @keyframes spotBreathe {
+    0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+    50%      { opacity: 1;    transform: translateX(-50%) scale(1.04); }
+  }
+
+  .beam {
+    position: absolute;
+    top: -10vh;
+    width: 1px;
+    height: 80vh;
+    background: linear-gradient(to bottom, var(--theme-glow), rgba(255, 220, 160, 0.06) 40%, transparent 100%);
+    filter: blur(0.5px);
+    opacity: 0;
+    transition: background 0.9s ease;
+  }
+  body.on-result .beam {
+    animation: beamOn 0.8s ease 0.6s both, beamFlicker 7s ease-in-out 1.4s infinite;
+  }
+  .beam.l { left: 8%;  transform: rotate(6deg); transform-origin: top; }
+  .beam.r { right: 8%; transform: rotate(-6deg); transform-origin: top; }
+  @keyframes beamOn { from { opacity: 0; } to { opacity: 0.7; } }
+  @keyframes beamFlicker {
+    0%, 100% { opacity: 0.5; }
+    45%      { opacity: 0.9; }
+    55%      { opacity: 0.65; }
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+    background-image:
+      repeating-radial-gradient(circle at 30% 40%, transparent 0, transparent 1px, rgba(255, 255, 255, 0.05) 1px, rgba(255, 255, 255, 0.05) 2px),
+      repeating-radial-gradient(circle at 70% 60%, transparent 0, transparent 1.5px, rgba(0, 0, 0, 0.10) 1.5px, rgba(0, 0, 0, 0.10) 3px);
+    background-size: 3px 3px, 4px 4px;
+    animation: grainShift 0.6s steps(3) infinite;
+  }
+  @keyframes grainShift {
+    0%   { background-position: 0 0, 0 0; }
+    33%  { background-position: 1px -1px, -1px 1px; }
+    66%  { background-position: -1px 1px, 1px -1px; }
+    100% { background-position: 0 0, 0 0; }
+  }
+
+  .film-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 26px;
+    z-index: 5;
+    pointer-events: none;
+    transition: background 0.9s ease, border-color 0.9s ease;
+  }
+  .film-strip.top {
+    top: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 100%);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7);
+    border-bottom: 1px solid var(--theme-glow);
+  }
+  .film-strip.bottom {
+    bottom: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 100%);
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.7);
+    border-top: 1px solid var(--theme-glow);
+  }
+  .film-strip::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 14px;
+    background-image: radial-gradient(circle at 7px 7px, var(--theme-glow) 4.5px, transparent 5px);
+    background-size: 18px 14px;
+    background-repeat: repeat-x;
+    transition: background-image 0.9s ease;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 26px 20px calc(44px + env(safe-area-inset-bottom));
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    transition: padding 0.6s ease;
+  }
+  body.on-result .app {
+    padding-top: 52px;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active {
+    display: flex;
+    animation: screenIn 0.5s cubic-bezier(0.22, 0.68, 0.32, 1) both;
+  }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .clapper {
+    height: 22px;
+    background: repeating-linear-gradient(-50deg, var(--ink) 0 14px, var(--paper) 14px 28px);
+    border-radius: 2px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+  }
+
+  /* 首页 */
+  #screen-intro.active { justify-content: center; padding-bottom: 5vh; }
+
+  .script-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 10.5px;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+  .script-head .red-mark { color: var(--red); font-weight: 700; }
+
+  .intro-title {
+    font-size: 32px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0 0 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .title-underline {
+    width: 64px;
+    height: 2px;
+    background: var(--red);
+    margin: 0 0 22px;
+    transform: skewX(-14deg);
+  }
+
+  .poem {
+    font-size: 16px;
+    line-height: 2.1;
+    color: var(--ink-soft);
+    margin: 0 0 30px;
+    padding-left: 16px;
+    border-left: 2.5px solid var(--red);
+    letter-spacing: 0.04em;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-bottom: 30px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
+
+  .btn-primary {
+    position: relative;
+    width: 100%;
+    padding: 17px 20px;
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 17px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+    transition: transform 0.14s ease, background 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .btn-primary:active {
+    transform: translateY(2px);
+    background: #000;
+  }
+
+  .disclaimer {
+    margin: 22px 0 0;
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--ink-mute);
+    text-align: center;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* 打字机过渡页 */
+  #screen-typing.active {
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 10vh;
+  }
+
+  .typing-inner {
+    text-align: center;
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .typing-label {
+    font-family: 'Courier New', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.4em;
+    color: var(--ink-mute);
+    margin-bottom: 22px;
+    text-transform: uppercase;
+  }
+
+  .typewriter-text {
+    display: inline-block;
+    font-family: 'Courier New', 'PingFang SC', 'Microsoft YaHei', monospace;
+    font-size: 17px;
+    line-height: 1.8;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    min-height: 1.8em;
+    padding-right: 4px;
+    border-right: 2px solid var(--red);
+    animation: cursorBlink 0.7s steps(1) infinite;
+  }
+  @keyframes cursorBlink {
+    50% { border-color: transparent; }
+  }
+
+  /* 答题页 */
+  .quiz-top { padding: 4px 0 18px; flex: 0 0 auto; }
+
+  .scene-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .scene-num {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--ink);
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .scene-num .red { color: var(--red); }
+
+  .progress-track {
+    flex: 1;
+    height: 1.5px;
+    background: rgba(60, 50, 40, 0.18);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0;
+    background: var(--red);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scene-tag {
+    font-size: 10.5px;
+    letter-spacing: 0.24em;
+    color: var(--ink-mute);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+
+  .qcard {
+    position: relative;
+    background: var(--card);
+    padding: 28px 22px 24px;
+    min-height: 400px;
+    border: 1px solid var(--line);
+    box-shadow: 0 3px 14px rgba(80, 60, 30, 0.08);
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.4s ease;
+    flex: 0 0 auto;
+  }
+  .qcard::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 44px;
+    height: 6px;
+    background: var(--red);
+  }
+  .qcard::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border-top: 1.5px solid var(--red);
+    border-right: 1.5px solid var(--red);
+    opacity: 0.4;
+  }
+  .qcard.out {
+    opacity: 0;
+    transform: rotate(-1.6deg) scale(0.96) translateX(-30px);
+    filter: blur(2px);
+  }
+  .qcard.pre {
+    transition: none !important;
+    opacity: 0;
+    transform: rotate(1.6deg) scale(1.04) translateX(30px);
+    filter: blur(2px);
+  }
+
+  .qnum {
+    font-size: 10.5px;
+    letter-spacing: 0.28em;
+    color: var(--red);
+    margin-bottom: 14px;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .qtext {
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    font-size: 18px;
+    line-height: 1.85;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 22px;
+    letter-spacing: 0.02em;
+    min-height: 3.7em;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .option {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 13px 12px;
+    border: none;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.7;
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    cursor: pointer;
+    z-index: 0;
+    transition: color 0.2s ease, transform 0.12s ease,
+                opacity 0.4s ease, transform 0.4s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .option:active { transform: scale(0.99); }
+
+  .option::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: var(--red);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .option.selected::before { opacity: 1; }
+  .option.selected { color: var(--ink); font-weight: 500; }
+
+  .option .tag {
+    flex: 0 0 22px;
+    height: 22px;
+    border: 1.2px solid var(--ink-mute);
+    border-radius: 50%;
+    position: relative;
+    margin-top: 1px;
+    background: transparent;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+  }
+  .option .tag .letter {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--ink-mute);
+    transition: opacity 0.2s ease, transform 0.25s ease;
+  }
+  .option .tag .check {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    transform: translate(-50%, -50%);
+    fill: none;
+    stroke: #FFFFFF;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+    transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.08s;
+  }
+  .option.selected .tag {
+    background: var(--red);
+    border-color: var(--red);
+    transform: scale(1.08);
+  }
+  .option.selected .tag .letter {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  .option.selected .tag .check {
+    stroke-dashoffset: 0;
+  }
+
+  .back-btn {
+    margin: 16px auto 0;
+    display: block;
+    background: transparent;
+    border: none;
+    color: var(--ink-mute);
+    font-size: 11.5px;
+    letter-spacing: 0.18em;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: color 0.2s ease, opacity 0.25s ease;
+    opacity: 0;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+  .back-btn.show { opacity: 1; pointer-events: auto; }
+  .back-btn:active { color: var(--ink); }
+
+  /* 分析中 */
+  .loading-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+    padding-bottom: 8vh;
+  }
+
+  .reel {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    animation: spin 3.6s linear infinite;
+  }
+  .reel::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+  .reel::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .reel .dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--ink);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    margin: -3px 0 0 -3px;
+  }
+  .reel .dot:nth-child(1) { transform: translateY(-24px); }
+  .reel .dot:nth-child(2) { transform: translateX(24px); }
+  .reel .dot:nth-child(3) { transform: translateY(24px); }
+  .reel .dot:nth-child(4) { transform: translateX(-24px); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.24em;
+    color: var(--ink-soft);
+    margin: 0;
+    text-align: center;
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+
+  /* 结果页 */
+  .result-head { text-align: center; margin-bottom: 20px; }
+  .result-head .script-head { color: var(--cinema-ink-mute); margin-bottom: 16px; }
+  .result-head .script-head .red-mark {
+    color: var(--theme-accent);
+    text-shadow: 0 0 12px var(--theme-glow);
+    transition: color 0.5s ease, text-shadow 0.5s ease;
+  }
+
+  .type-name {
+    font-size: 28px;
+    color: var(--cinema-ink);
+    margin: 0 0 16px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    font-family: 'Songti SC', 'STSong', 'Noto Serif SC', 'SimSun', serif;
+    font-weight: 700;
+    text-shadow: 0 0 24px var(--theme-glow);
+    transition: text-shadow 0.6s ease;
+  }
+
+  .type-name-wrap {
+    position: relative;
+    display: inline-block;
+    padding: 0 8px;
+  }
+  .type-name-wrap::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 3px;
+    background: var(--theme-accent);
+    transform: skewX(-12deg) rotate(-0.4deg);
+    opacity: 0.9;
+    box-shadow: 0 0 14px var(--theme-glow);
+    transition: background 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .type-line {
+    font-size: 13.5px;
+    line-height: 1.95;
+    color: var(--cinema-ink-soft);
+    margin: 12px auto 0;
+    max-width: 330px;
+    letter-spacing: 0.02em;
+    font-family: 'Songti SC', 'STSong', serif;
+    font-style: italic;
+  }
+
+  .radar-wrap {
+    width: 100%;
+    max-width: 340px;
+    margin: 28px auto 6px;
+    pointer-events: none;
+    filter: drop-shadow(0 0 20px var(--theme-glow));
+    transition: filter 0.9s ease;
+  }
+  #radar { display: block; margin: 0 auto; }
+
+  .dims {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 18px 0 30px;
+    padding: 20px 18px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--theme-glow);
+    border-left: 3px solid var(--theme-accent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 var(--theme-glow);
+    transition: border-color 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .dim-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 11.5px;
+    color: var(--cinema-ink-soft);
+    letter-spacing: 0.12em;
+    margin-bottom: 7px;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+  .dim-val {
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-accent);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 10px var(--theme-glow);
+    transition: color 0.6s ease, text-shadow 0.6s ease;
+  }
+
+  .dim-track { height: 3px; background: rgba(255, 220, 160, 0.12); overflow: hidden; }
+  .dim-fill {
+    height: 100%;
+    width: 0;
+    background: var(--theme-accent);
+    transition: width 0.95s cubic-bezier(0.22, 0.68, 0.32, 1),
+                background 0.6s ease, box-shadow 0.6s ease;
+    box-shadow: 0 0 8px var(--theme-glow);
+  }
+
+  .report { display: flex; flex-direction: column; gap: 10px; }
+
+  .block {
+    background: rgba(255, 255, 255, 0.035);
+    padding: 18px 18px 16px;
+    border: 1px solid var(--theme-glow);
+    border-left: 3px solid var(--theme-accent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 var(--theme-glow);
+    transition: border-color 0.6s ease, box-shadow 0.6s ease;
+  }
+  .block h3 {
+    font-size: 10.5px;
+    letter-spacing: 0.28em;
+    color: var(--cinema-ink-mute);
+    margin: 0 0 12px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+  .block p { margin: 0; font-size: 13.5px; line-height: 2; color: var(--cinema-ink-soft); }
+  .block ul { margin: 0; padding: 0; list-style: none; }
+  .block li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 13.5px;
+    line-height: 2;
+    color: var(--cinema-ink-soft);
+    margin-bottom: 6px;
+  }
+  .block li:last-child { margin-bottom: 0; }
+  .block li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--theme-accent);
+    font-weight: 700;
+    transition: color 0.6s ease;
+  }
+
+  /* 票根 */
+  .ticket {
+    position: relative;
+    background: var(--ticket);
+    margin: 34px 0 6px;
+    padding: 30px 24px 24px;
+    box-shadow:
+      0 8px 26px rgba(120, 100, 60, 0.28),
+      0 0 60px var(--theme-glow),
+      0 0 120px var(--theme-spot);
+    transition: box-shadow 0.9s ease;
+  }
+  .ticket::before,
+  .ticket::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background-image: radial-gradient(circle at 6px 6px, var(--theme-bg) 6px, transparent 6.5px);
+    background-size: 16px 12px;
+    background-repeat: repeat-x;
+    transition: background-image 0.9s ease;
+  }
+  .ticket::before { top: -6px; }
+  .ticket::after { bottom: -6px; transform: rotate(180deg); }
+
+  .ticket > * { opacity: 0; }
+  .ticket.ticket-visible > * {
+    animation: printIn 0.45s cubic-bezier(0.22, 0.68, 0.32, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+  }
+  @keyframes printIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .ticket-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .ticket-head .admit { color: var(--red); font-weight: 700; }
+
+  .ticket-title {
+    font-size: 13px;
+    color: var(--ink);
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+    font-family: 'Songti SC', 'STSong', serif;
+    font-style: italic;
+  }
+
+  .ticket-divider {
+    border-top: 1px dashed var(--ink-mute);
+    opacity: 0.55;
+    margin: 18px 0;
+    position: relative;
+  }
+  .ticket-divider::before,
+  .ticket-divider::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    width: 16px;
+    height: 16px;
+    background: var(--theme-bg);
+    border-radius: 50%;
+    transition: background 0.9s ease;
+  }
+  .ticket-divider::before { left: -32px; }
+  .ticket-divider::after { right: -32px; }
+
+  .ticket-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .ticket-row .val { color: var(--ink); font-weight: 700; }
+
+  .kw-label {
+    font-size: 9.5px;
+    letter-spacing: 0.34em;
+    color: var(--red);
+    margin-bottom: 12px;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .kw-text {
+    font-size: 16.5px;
+    line-height: 1.8;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    font-family: 'ZCOOL KuaiLe', 'Songti SC', serif;
+  }
+
+  .ticket-foot {
+    font-size: 9.5px;
+    letter-spacing: 0.32em;
+    color: var(--ink-mute);
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(60, 50, 40, 0.15);
+  }
+
+  .note {
+    margin: 30px 0 0;
+    font-size: 12px;
+    line-height: 1.95;
+    color: var(--cinema-ink-mute);
+    text-align: center;
+    letter-spacing: 0.08em;
+    font-family: 'Songti SC', 'STSong', serif;
+    font-style: italic;
+  }
+
+  .actions { display: flex; gap: 10px; margin-top: 28px; }
+  .actions .btn-primary {
+    flex: 1.3;
+    padding: 15px 10px;
+    font-size: 14.5px;
+    letter-spacing: 0.16em;
+    background: var(--theme-accent);
+    border-color: var(--theme-accent);
+    color: var(--theme-btn-text);
+    box-shadow: 0 0 24px var(--theme-glow);
+    transition: background 0.6s ease, border-color 0.6s ease,
+                color 0.6s ease, box-shadow 0.6s ease, transform 0.12s ease;
+  }
+  .actions .btn-primary:active {
+    transform: translateY(2px);
+    filter: brightness(0.88);
+  }
+
+  .btn-ghost {
+    flex: 1;
+    padding: 15px 10px;
+    border: 1.5px solid rgba(240, 230, 200, 0.45);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--cinema-ink);
+    font-size: 14.5px;
+    letter-spacing: 0.16em;
+    font-family: 'ZCOOL KuaiLe', 'PingFang SC', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .btn-ghost:active {
+    transform: translateY(2px);
+    background: rgba(255, 220, 160, 0.08);
+    border-color: rgba(240, 230, 200, 0.7);
+  }
+
+  .footnote {
+    margin: 26px 0 0;
+    font-size: 10px;
+    line-height: 1.85;
+    color: var(--cinema-ink-mute);
+    text-align: center;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 46px;
+    transform: translate(-50%, 16px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 22px;
+    border-radius: 2px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 99;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 360px) {
+    .intro-title { font-size: 28px; }
+    .qtext { font-size: 16.5px; }
+    .option { font-size: 13.5px; }
+    .type-name { font-size: 24px; }
+    .kw-text { font-size: 15px; }
+    .typewriter-text { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="transition-mask"></div>
+
+<div class="cinema-env" aria-hidden="true">
+  <div class="spotlight"></div>
+  <div class="beam l"></div>
+  <div class="beam r"></div>
+  <div class="grain"></div>
+  <div class="film-strip top"></div>
+  <div class="film-strip bottom"></div>
+</div>
+
+<div class="app">
+
+  <!-- ==================== 首页 ==================== -->
+  <section id="screen-intro" class="screen active">
+    <div class="clapper"></div>
+    <div class="script-head">
+      <span>Production No. 001</span>
+      <span class="red-mark">Shooting Script</span>
+    </div>
+    <h1 class="intro-title hand">
+      人生如戏，<br>
+      你将如何导演？
+    </h1>
+    <div class="title-underline"></div>
+    <p class="poem hand">
+      你的人生如果被拍成一部电影，<br>
+      它是什么调色，什么镜头，<br>
+      什么配乐，什么结局——<br>
+      二十个问题之后，<br>
+      你会看到它在银幕上显影。
+    </p>
+    <div class="meta-row mono">
+      <span>20 Scenes</span>
+      <span class="meta-dot"></span>
+      <span>16 Directors</span>
+      <span class="meta-dot"></span>
+      <span>About 5 min</span>
+    </div>
+    <button class="btn-primary hand" id="startBtn">开 拍</button>
+    <p class="disclaimer mono">趣味自测 · 不构成心理学诊断</p>
+  </section>
+
+  <!-- ==================== 打字机过渡页 ==================== -->
+  <section id="screen-typing" class="screen">
+    <div class="typing-inner">
+      <div class="typing-label">Pre-Production</div>
+      <div class="typewriter-text"></div>
+    </div>
+  </section>
+
+  <!-- ==================== 答题页 ==================== -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-top">
+      <div class="scene-line">
+        <span class="scene-num mono">Scene <span class="red" id="qIndex">01</span></span>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="scene-num mono" style="color: var(--ink-mute); font-weight: 400;">/ 20</span>
+      </div>
+      <div class="scene-tag">Take <span id="qNum">01</span> &nbsp;·&nbsp; 镜头清单</div>
+    </div>
+    <div class="qcard" id="qcard">
+      <div class="qnum">Q U E S T I O N &nbsp; <span id="qNum2">01</span></div>
+      <h2 class="qtext" id="qText"></h2>
+      <div class="options" id="options"></div>
+    </div>
+    <button class="back-btn" id="backBtn">← Previous Take</button>
+  </section>
+
+  <!-- ==================== 分析中 ==================== -->
+  <section id="screen-loading" class="screen">
+    <div class="loading-inner">
+      <div class="reel">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <p class="loading-text" id="loadingText">正在冲洗你的胶片……</p>
+    </div>
+  </section>
+
+  <!-- ==================== 结果页 ==================== -->
+  <section id="screen-result" class="screen">
+    <div class="result-head">
+      <div class="script-head">
+        <span>Now Showing</span>
+        <span class="red-mark">Rated R</span>
+      </div>
+      <div class="type-name-wrap">
+        <h1 class="type-name" id="resName"></h1>
+      </div>
+      <p class="type-line" id="resLine"></p>
+    </div>
+
+    <div class="radar-wrap"><canvas id="radar"></canvas></div>
+    <div class="dims" id="dims"></div>
+
+    <div class="report">
+      <div class="block"><h3>Director's Statement</h3><p id="resDesc"></p></div>
+      <div class="block"><h3>Your Film Grammar</h3><ul id="resTraits"></ul></div>
+      <div class="block"><h3>Common Misreading</h3><p id="resMis"></p></div>
+      <div class="block"><h3>Hidden Cut Point</h3><p id="resBoundary"></p></div>
+    </div>
+
+    <div class="ticket" id="ticket">
+      <div class="ticket-head" style="--i:0">
+        <span class="admit">Admit One</span>
+        <span id="ticketNo">No. 0000</span>
+      </div>
+      <div class="ticket-title" style="--i:1">《人生如戏，你将如何导演？》</div>
+      <div class="ticket-row" style="--i:2"><span>影院</span><span class="val">你自己</span></div>
+      <div class="ticket-row" style="--i:3"><span>场次</span><span class="val" id="ticketTime">2026.09.30 23:47</span></div>
+      <div class="ticket-row" style="--i:4"><span>座位</span><span class="val" id="ticketSeat">8 排 7 座</span></div>
+      <div class="ticket-divider" style="--i:5"></div>
+      <div class="kw-label" style="--i:6">Hidden Key · 导演手记</div>
+      <div class="kw-text" style="--i:7" id="resKeyword"></div>
+      <div class="ticket-foot" style="--i:8">不对号入座 · 中途不散场 · 只放映一次</div>
+    </div>
+
+    <p class="note">
+      这不是在给你贴标签，<br>
+      而是在描述你习惯用哪种方式，<br>
+      把自己的人生剪成一部电影。
+    </p>
+
+    <div class="actions">
+      <button class="btn-ghost" id="retryBtn">重 拍</button>
+      <button class="btn-primary hand" id="shareBtn">分 享 结 果</button>
+    </div>
+
+    <p class="footnote">趣味自测 · 不构成心理学诊断或医学建议</p>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     16 种类型主题色
+     ========================================================= */
+  const TYPE_THEMES = {
+    neon:      { bg: '#0F0814', accent: '#FF4D9D', glow: 'rgba(255, 77, 157, 0.5)',  fill: 'rgba(255, 77, 157, 0.22)',  spot: 'rgba(255, 120, 180, 0.20)' },
+    doc:       { bg: '#0A0D12', accent: '#A8B5C4', glow: 'rgba(168, 181, 196, 0.4)', fill: 'rgba(168, 181, 196, 0.18)', spot: 'rgba(200, 215, 230, 0.16)' },
+    loop:      { bg: '#12100A', accent: '#D4A853', glow: 'rgba(212, 168, 83, 0.45)', fill: 'rgba(212, 168, 83, 0.20)',  spot: 'rgba(230, 190, 110, 0.20)' },
+    blackout:  { bg: '#0A0505', accent: '#B03030', glow: 'rgba(176, 48, 48, 0.45)',  fill: 'rgba(176, 48, 48, 0.20)',   spot: 'rgba(180, 60, 60, 0.16)' },
+    roadtrip:  { bg: '#14100A', accent: '#FF8B3D', glow: 'rgba(255, 139, 61, 0.5)',  fill: 'rgba(255, 139, 61, 0.22)',  spot: 'rgba(255, 180, 100, 0.24)' },
+    homevideo: { bg: '#100D08', accent: '#C4A878', glow: 'rgba(196, 168, 120, 0.4)', fill: 'rgba(196, 168, 120, 0.18)', spot: 'rgba(210, 185, 140, 0.18)' },
+    jazz:      { bg: '#080A14', accent: '#5B7CB8', glow: 'rgba(91, 124, 184, 0.5)',  fill: 'rgba(91, 124, 184, 0.22)',  spot: 'rgba(120, 150, 210, 0.20)' },
+    ensemble:  { bg: '#100B08', accent: '#C97B4A', glow: 'rgba(201, 123, 74, 0.45)', fill: 'rgba(201, 123, 74, 0.20)',  spot: 'rgba(220, 150, 100, 0.20)' },
+    cutafter:  { bg: '#0C0A10', accent: '#9B8BA8', glow: 'rgba(155, 139, 168, 0.4)', fill: 'rgba(155, 139, 168, 0.18)', spot: 'rgba(170, 155, 185, 0.16)' },
+    montage:   { bg: '#08100E', accent: '#6BC9B0', glow: 'rgba(107, 201, 176, 0.45)', fill: 'rgba(107, 201, 176, 0.20)', spot: 'rgba(130, 210, 185, 0.20)' },
+    chase:     { bg: '#0C0C0E', accent: '#D8D8D8', glow: 'rgba(216, 216, 216, 0.4)', fill: 'rgba(216, 216, 216, 0.18)', spot: 'rgba(230, 230, 230, 0.16)' },
+    silhouette:{ bg: '#100814', accent: '#B85BD4', glow: 'rgba(184, 91, 212, 0.5)',  fill: 'rgba(184, 91, 212, 0.22)',  spot: 'rgba(200, 120, 220, 0.22)' },
+    nightcar:  { bg: '#080A14', accent: '#4A6BC9', glow: 'rgba(74, 107, 201, 0.5)',  fill: 'rgba(74, 107, 201, 0.22)',  spot: 'rgba(100, 130, 220, 0.20)' },
+    empty:     { bg: '#0A100C', accent: '#8BA89B', glow: 'rgba(139, 168, 155, 0.4)', fill: 'rgba(139, 168, 155, 0.18)', spot: 'rgba(160, 190, 175, 0.16)' },
+    reshoot:   { bg: '#0C1208', accent: '#A8E85A', glow: 'rgba(168, 232, 90, 0.45)', fill: 'rgba(168, 232, 90, 0.20)',  spot: 'rgba(180, 240, 120, 0.20)' },
+    director:  { bg: '#0C0A08', accent: '#D4A853', glow: 'rgba(212, 168, 83, 0.45)', fill: 'rgba(212, 168, 83, 0.20)',  spot: 'rgba(230, 190, 110, 0.20)' }
+  };
+
+  function getBtnTextColor(hex) {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 140 ? '#0A0A0F' : '#FFF5EC';
+  }
+
+  function applyTheme(type) {
+    const theme = TYPE_THEMES[type.id] || TYPE_THEMES.director;
+    const root = document.documentElement;
+    root.style.setProperty('--theme-bg', theme.bg);
+    root.style.setProperty('--theme-accent', theme.accent);
+    root.style.setProperty('--theme-glow', theme.glow);
+    root.style.setProperty('--theme-fill', theme.fill);
+    root.style.setProperty('--theme-spot', theme.spot);
+    root.style.setProperty('--theme-btn-text', getBtnTextColor(theme.accent));
+  }
+
+  function getRadarColors() {
+    const cs = getComputedStyle(document.documentElement);
+    return {
+      accent: cs.getPropertyValue('--theme-accent').trim() || '#E85A4A',
+      fill:   cs.getPropertyValue('--theme-fill').trim()   || 'rgba(232, 90, 74, 0.22)',
+      glow:   cs.getPropertyValue('--theme-glow').trim()   || 'rgba(232, 90, 74, 0.45)'
+    };
+  }
+
+  /* =========================================================
+     题库
+     ========================================================= */
+  const QUESTIONS = [
+    { text: '你想拍一部关于自己的电影，胶片调色会选哪一种？',
+      options: [
+        { t: '暖橘与琥珀——像傍晚六点的厨房，像被太阳晒过的旧照片', v: [3, 0, 1, 1, 2] },
+        { t: '冷蓝与银灰——像凌晨四点的屏幕光，像雨后的柏油路', v: [1, 1, 1, 2, 1] },
+        { t: '自然色——不用滤镜，是什么颜色就是什么颜色', v: [2, 1, 1, 1, 2] },
+        { t: '高饱和——所有颜色都推到极致，红得刺眼，绿得发亮', v: [0, 2, 3, 3, 2] }
+      ]
+    },
+    { text: '你希望观众用什么距离看你？',
+      options: [
+        { t: '贴得很近，近到能看见毛孔和犹豫', v: [1, 0, 1, 2, 1] },
+        { t: '中景。看得清动作，但看不清表情', v: [2, 1, 1, 1, 2] },
+        { t: '远景。你是一个人，也是风景的一部分', v: [1, 2, 2, 0, 1] },
+        { t: '镜头始终在动，观众追着你跑', v: [2, 3, 3, 3, 2] }
+      ]
+    },
+    { text: '你的人生电影里，光从哪里来？',
+      options: [
+        { t: '路灯。不太亮，但一直亮着', v: [1, 1, 1, 1, 2] },
+        { t: '手机屏幕。冷光，从下往上照着脸', v: [3, 2, 2, 3, 1] },
+        { t: '缝隙里。从窗帘没拉严的地方漏进来', v: [1, 2, 1, 1, 2] },
+        { t: '我不知道。有时候全黑，有时候过曝', v: [2, 2, 3, 2, 3] }
+      ]
+    },
+    { text: '如果你的情绪可以被听见，它最像——',
+      options: [
+        { t: '一首循环了很多年的钢琴曲，没有高潮', v: [1, 1, 1, 1, 2] },
+        { t: '电子脉冲。有规律的，但听久了会头疼', v: [2, 2, 3, 3, 1] },
+        { t: '环境音。雨声、空调声、地铁报站', v: [2, 1, 1, 1, 2] },
+        { t: '静音。偶尔有别人的声音飘过来', v: [0, 1, 0, 0, 1] }
+      ]
+    },
+    { text: '电影的最后三秒，你想让观众看到什么？',
+      options: [
+        { t: '主角继续做着一件很日常的事，好像什么都没发生过', v: [2, 1, 1, 1, 2] },
+        { t: '一个微笑，但你不知道是不是真的', v: [1, 1, 2, 2, 1] },
+        { t: '黑屏。字幕还没出来的时候，观众已经散场了', v: [1, 2, 0, 0, 0] },
+        { t: '回到开头的那一幕，但这次观众看懂了', v: [2, 1, 2, 2, 3] }
+      ]
+    },
+    { text: '你的人生电影里，时间是怎么流动的？',
+      options: [
+        { t: '像一条河，缓慢地、不可逆地流过去', v: [1, 1, 1, 1, 3] },
+        { t: '像一张跳针的唱片，反复回到同一段旋律', v: [2, 2, 2, 3, 1] },
+        { t: '像一部被快进的默片，来不及看清楚就过去了', v: [2, 3, 2, 2, 0] },
+        { t: '像被剪辑过的碎片，前后颠倒，无所谓顺序', v: [3, 3, 3, 2, 2] }
+      ]
+    },
+    { text: '拍你和一个人告别的那场戏，你的镜头会——',
+      options: [
+        { t: '长时间停在对方脸上，哪怕已经说完了所有台词', v: [1, 0, 1, 2, 1] },
+        { t: '切到远处的空镜头，只留下声音', v: [1, 2, 2, 1, 2] },
+        { t: '跟着你走，观众看着你的背影越走越远', v: [2, 2, 1, 1, 1] },
+        { t: '快速跳切，不给观众反应的时间', v: [2, 3, 2, 3, 0] }
+      ]
+    },
+    { text: '如果这部电影有一个标志性的画面，它会是——',
+      options: [
+        { t: '雨后的霓虹灯倒映在柏油路上，你站在路口等一个不会来的人', v: [1, 1, 1, 1, 2] },
+        { t: '午后的窗边，灰尘在光柱里漂浮，你靠在墙上什么也没做', v: [1, 1, 2, 0, 2] },
+        { t: '深夜的走廊尽头，只有一盏灯还亮着，你不知道该不该走过去', v: [2, 1, 1, 1, 1] },
+        { t: '白天的阳光太刺眼，你眯着眼，什么也看不清', v: [2, 2, 3, 2, 1] }
+      ]
+    },
+    { text: '你觉得导演应该在什么时候放音乐？',
+      options: [
+        { t: '在观众快要哭出来的时候，推一把', v: [1, 1, 2, 2, 2] },
+        { t: '在观众以为不会有音乐的时候，突然响起来', v: [2, 2, 2, 3, 2] },
+        { t: '从头到尾都有，像呼吸一样自然', v: [2, 1, 1, 1, 3] },
+        { t: '不放。沉默比音乐更有力量', v: [0, 1, 0, 0, 1] }
+      ]
+    },
+    { text: '如果这部电影有续集，你希望它叫什么？',
+      options: [
+        { t: '《后来我们都学会了》——所有人都长大了', v: [2, 1, 2, 2, 2] },
+        { t: '《还是那个路口》——什么都没变，又好像什么都变了', v: [1, 2, 1, 1, 3] },
+        { t: '《散场之后》——镜头跟着观众走出影院', v: [1, 2, 1, 0, 0] },
+        { t: '没有续集。故事就该停在这里', v: [1, 1, 1, 1, 1] }
+      ]
+    },
+    { text: '如果要给你的电影标注一个年代，你会写——',
+      options: [
+        { t: '一个说不清的年代，但一定不是现在', v: [1, 1, 1, 1, 2] },
+        { t: '现在。此时此刻，没有任何滤镜', v: [3, 3, 2, 2, 1] },
+        { t: '未来。但未来看起来很像过去', v: [1, 2, 1, 3, 2] },
+        { t: '我不标注。让观众自己去猜', v: [3, 2, 3, 3, 3] }
+      ]
+    },
+    { text: '你希望观众看完这部电影之后——',
+      options: [
+        { t: '觉得被理解了。像有人替他们说出了心里的话', v: [1, 1, 2, 2, 2] },
+        { t: '说不清是什么感觉。但过了几天突然想起来某个画面', v: [2, 2, 2, 2, 2] },
+        { t: '想再看一遍。因为第一遍没看懂', v: [2, 3, 2, 3, 3] },
+        { t: '沉默地走出影院，不想和任何人讨论', v: [0, 1, 0, 0, 0] }
+      ]
+    },
+    { text: '你更愿意待在光里还是影子里？',
+      options: [
+        { t: '光里。哪怕会被人看见，也不想躲', v: [2, 1, 2, 2, 2] },
+        { t: '影子里。影子让人安心，也让人自由', v: [1, 2, 0, 1, 1] },
+        { t: '交界处。一半亮一半暗，我站在中间', v: [2, 1, 1, 1, 2] },
+        { t: '我不在乎。光来我就亮，光走我就暗', v: [2, 3, 3, 2, 3] }
+      ]
+    },
+    { text: '如果整部电影只有一处有声音，你希望是哪里？',
+      options: [
+        { t: '开场。之后全是静默，让观众自己填满', v: [0, 2, 0, 0, 1] },
+        { t: '高潮。所有的情绪都在那一瞬间炸开', v: [2, 1, 2, 3, 2] },
+        { t: '结尾。字幕滚动的时候，响起一首老歌', v: [1, 1, 2, 2, 3] },
+        { t: '到处都是声音，只是观众听不见', v: [3, 3, 3, 3, 3] }
+      ]
+    },
+    { text: '如果这部电影的字幕不是"剧终"，而是另一句话——',
+      options: [
+        { t: '"有些故事不需要结局"', v: [2, 2, 1, 1, 2] },
+        { t: '"未完待续"', v: [2, 2, 2, 2, 1] },
+        { t: '"谢谢观看"', v: [1, 1, 2, 1, 1] },
+        { t: '"你已经看过了。只是不记得"', v: [3, 3, 3, 3, 3] }
+      ]
+    },
+    { text: '你更愿意相信一件旧物还是一封新消息？',
+      options: [
+        { t: '旧物。旧物有别人的体温，让人安心', v: [1, 1, 1, 0, 2] },
+        { t: '新消息。新消息里有还没发生的事', v: [3, 2, 2, 3, 2] },
+        { t: '都信。也都不信。所有东西都会过期', v: [2, 2, 2, 2, 2] },
+        { t: '我不相信任何被留下来的东西', v: [3, 3, 1, 3, 3] }
+      ]
+    },
+    { text: '如果镜头必须对准你的某个身体部位，你希望是——',
+      options: [
+        { t: '眼睛。但只拍睫毛的阴影', v: [1, 0, 1, 1, 1] },
+        { t: '手。手比脸更能说明一切', v: [1, 1, 1, 1, 1] },
+        { t: '背影。不给正脸，留一点余地', v: [1, 2, 1, 1, 2] },
+        { t: '不要拍我。拍我窗外的树', v: [1, 3, 2, 1, 3] }
+      ]
+    },
+    { text: '你的电影主色调是——',
+      options: [
+        { t: '灰蓝。像凌晨四点的天空', v: [2, 2, 1, 1, 2] },
+        { t: '暖橘。像傍晚六点的厨房', v: [1, 1, 2, 2, 2] },
+        { t: '纯黑与纯白。没有中间色', v: [0, 1, 0, 0, 1] },
+        { t: '所有颜色混在一起。脏，但真实', v: [3, 3, 3, 3, 3] }
+      ]
+    },
+    { text: '如果要为你的电影选一种乐器——',
+      options: [
+        { t: '钢琴。干净，克制，有距离感', v: [1, 1, 1, 1, 2] },
+        { t: '大提琴。低音，缓慢，像一个人在说话', v: [1, 2, 2, 1, 1] },
+        { t: '合成器。没有体温，但很有力量', v: [2, 2, 2, 3, 1] },
+        { t: '鼓。一下一下，推着人往前走', v: [2, 3, 2, 3, 2] }
+      ]
+    },
+    { text: '如果这部电影可以被重拍一次，你会改变什么？',
+      options: [
+        { t: '不改变。所有的选择都是当时最好的', v: [2, 2, 2, 2, 2] },
+        { t: '换一个主角，让故事走向完全不同', v: [2, 3, 2, 3, 2] },
+        { t: '只改一个细节，但让所有事情都不一样', v: [1, 2, 1, 1, 3] },
+        { t: '不重拍。拍好了就是拍好了，再拍就没意思了', v: [1, 1, 1, 1, 1] }
+      ]
+    }
+  ];
+
+  const DIM_NAMES = ['年代感', '镜头语言', '光影基调', '配乐风格', '结尾倾向'];
+  const MAX_PER_DIM = QUESTIONS.length * 3;
+
+  const TYPES = [
+    { id: 'neon', name: '潮湿霓虹的失眠长镜头', proto: [62, 22, 35, 45, 55],
+      line: '你把生活过成一部王家卫。暧昧是你最熟悉的安全距离，确定的答案反而让你想逃',
+      desc: '你不喜欢把话说满。"可能""也许""再看吧"是你最常用的词。你觉得一旦确定了，某些东西就会消失——像雨停了之后，霓虹灯看起来就没那么好看了。你习惯在凌晨三点想一个人，但白天遇到ta的时候，你会假装在看手机',
+      traits: ['喜欢在深夜回忆白天发生的事，反复咀嚼一个眼神、一句话','关系里最舒服的状态是"还没开始"，一旦确定反而想退','对气味、光线、声音这些细节的记忆力远超常人','别人觉得你神秘，其实你只是不知道怎么说清楚'],
+      mis: '有人觉得你"不认真""不主动"。其实你只是相信，有些关系一旦被命名，就会变成另一种东西。你享受那种"还没有开始"的状态——在那里面，一切都有可能',
+      boundary: '你最怕的不是失去，是"确定"。一旦确定，浪漫就变成了责任',
+      keyword: '「我把每一段关系都拍成慢镜头，是因为我怕它结束得太快」' },
+    { id: 'doc', name: '没有配乐的纪录片', proto: [42, 72, 62, 8, 55],
+      line: '你的人生是真实电影，但你自己很少出现在画面里',
+      desc: '你习惯做一个观察者。别人在热烈地生活，你在旁边安静地看着。你不觉得这有什么问题——你觉得记录本身就是一种参与。你很少主动表达情绪，不是因为不在乎，而是因为你觉得说出来就变了味',
+      traits: ['在朋友圈里像隐形人，但记得每个朋友说过的话','喜欢安静的环境，人太多的时候会想找个角落待着','别人问你"怎么了"，你通常回答"没事"，然后真的就没事了','比起表达自己，你更擅长倾听别人'],
+      mis: '别人觉得你"高冷""不好接近"。其实你只是不太主动。如果有人愿意先开口，你能聊很深。你不是不想被了解，你只是不太会主动递出那把钥匙',
+      boundary: '你的沉默不是拒绝，是你觉得没有必要用语言填满每一段空白。真正的理解不需要配乐',
+      keyword: '「我拍了很多素材，但从来不剪辑。因为我觉得原片就很好」' },
+    { id: 'loop', name: '循环播放的定格画面', proto: [50, 28, 50, 68, 82],
+      line: '你反复回到同一个瞬间，明知道回不去',
+      desc: '你的记忆里有一个画面，一直在循环。可能是一句话，一个下午，一个人的表情。你知道那已经过去了，但你还是忍不住回去。你不是放不下，你只是觉得那个瞬间里，有你最好的部分。你的人生像一张定格照片，其他的都是背景',
+      traits: ['有一首歌、一个地点、一种气味让你瞬间回到过去','常常在心里重演一件事，想象"如果当时换一种做法"','对旧物、旧照片、旧对话有很深的依恋','别人觉得你往前走了，其实你只是学会了带着那个瞬间一起走'],
+      mis: '别人觉得你"想太多""放不下"。其实你不是放不下，你只是不想放。那个瞬间对你来说太重要了，重要到你愿意用一生去反复播放它',
+      boundary: '你的边界在"现在"和"过去"之间。你大部分时间都活在现在，但心里永远给那个瞬间留着一块地方',
+      keyword: '「我不是走不出来。我是不想走」' },
+    { id: 'blackout', name: '永远差三秒的黑屏', proto: [45, 75, 25, 15, 8],
+      line: '你总是提前离场，差一点就能看到结局',
+      desc: '你在关系里有一种本能：在快要靠近的时候退开。不是不喜欢，是太喜欢了。你怕看到结局——不管结局是好是坏，你都怕。所以你选择在最后三秒转身。别人以为你不在意，其实你比谁都在意',
+      traits: ['在关系升温的时候会突然冷淡，自己也说不清为什么','喜欢一个人很久，但从来不主动说','告别的时候很少回头，因为怕自己会舍不得','常常在事情快要有结果的时候选择放弃'],
+      mis: '别人觉得你"忽冷忽热""难以捉摸"。其实你只是太害怕了。你怕的不是失败，是成功之后又失去。所以你宁愿不要那个结局',
+      boundary: '你的边界在"最后一秒"。你能走到离结局很近的地方，但你不会踏出那一步。那是你保护自己的方式',
+      keyword: '「我不是不想看结局。我是怕结局看完之后，就没有了」' },
+    { id: 'roadtrip', name: '过曝的夏日公路片', proto: [70, 82, 92, 78, 62],
+      line: '你让太多光进来，有时候会刺眼',
+      desc: '你活得很大声。开心的时候会笑到所有人都听见，难过的时候也会哭得很用力。你不喜欢藏着掖着，你觉得情绪就是要表达出来才叫情绪。你的生活像一部过曝的夏日公路片——明亮、热烈、有点吵，但很真实',
+      traits: ['情绪来得快去得也快，不记仇','喜欢热闹，喜欢和朋友待在一起','说话直接，不会拐弯抹角','常常因为太热情而吓到别人，但你自己不觉得'],
+      mis: '别人觉得你"太吵""不够细腻"。其实你的细腻藏在别的地方——你会记得朋友的生日，会在意每个人的情绪，只是你表达关心的方式比较大声',
+      boundary: '你的边界很宽，宽到有时候自己都忘了还有边界这回事。但一旦有人真的伤到你，你会关得很彻底',
+      keyword: '「我不怕晒。我怕的是天黑下来的时候，我一个人」' },
+    { id: 'homevideo', name: '手持镜头的家庭录像', proto: [58, 55, 55, 38, 58],
+      line: '你的生活是别人拍的，但你也不知道摄影师是谁',
+      desc: '你的人生好像一直在被别人定义。父母希望你成为什么样的人，朋友觉得你是什么样的人，社会告诉你应该过什么样的生活。你拿着这些标签往前走，慢慢忘了自己本来想拍一部什么样的电影。你不是没有想法，你只是不太确定那个想法是不是"真的属于你"',
+      traits: ['常常在别人的期待和自己的意愿之间摇摆','做完一个决定之后，会反复怀疑自己是不是选错了','不太敢说自己"想要什么"，但很擅长说"都可以"','偶尔会有一种"这不是我想要的生活"的念头，但很快压下去'],
+      mis: '别人觉得你"没主见""随和"。其实你有很多想法，只是那些想法还没有被认真听见过。你需要的不是被指导，是被相信',
+      boundary: '你的边界还在形成中。你正在学习一件事：你的人生电影，导演只能是你自己',
+      keyword: '「我一直在别人的镜头里活着。现在我想试试，自己拿一次摄像机」' },
+    { id: 'jazz', name: '雨水打湿的爵士乐', proto: [68, 38, 42, 62, 72],
+      line: '你的情绪是湿的，适合在深夜独自播放',
+      desc: '你有很深的情绪，但很少让它们完全出来。你习惯用一种缓慢的、带点忧郁的方式感受世界。你的快乐和悲伤是同一件事的两种颜色——不浓烈，但很持久。你像一首被雨水打湿的爵士乐，没有人听见，但一直在响',
+      traits: ['喜欢雨天，喜欢夜晚，喜欢一个人待着但不开灯','有很长的歌单，但只在自己一个人的时候听','对美的感知比一般人敏锐，容易被一首歌、一句话击中','情绪不轻易外露，但一旦写下来会很长'],
+      mis: '别人觉得你"多愁善感""想太多"。其实你不是想太多，你只是感受得比别人深。你不需要被安慰，你需要被允许待在自己的情绪里',
+      boundary: '你的边界在"感受"和"表达"之间。你可以感受到所有东西，但只愿意让极少数人听到那首正在播放的歌',
+      keyword: '「我不难过。我只是需要一点时间，让雨停下来」' },
+    { id: 'ensemble', name: '深焦镜头里的群像', proto: [60, 85, 70, 55, 45],
+      line: '你同时活在很多人的故事里，自己的那一页是空的',
+      desc: '你是一个很好的朋友、很好的倾听者、很好的陪伴者。你出现在所有人的生活里，帮他们解决问题、听他们倾诉、陪他们度过难关。但当你一个人的时候，你会发现自己的故事好像没什么可说的。你把镜头给了所有人，唯独没有对准自己',
+      traits: ['朋友很多，但真正能说心里话的人很少','习惯在别人需要的时候出现，但很少主动求助','别人觉得你"很靠谱"，但你自己知道那是因为你不敢不靠谱','常常在热闹的人群里突然感到孤独'],
+      mis: '别人觉得你"很坚强""不需要被照顾"。其实你只是习惯了照顾别人。你也想有人问一句"你还好吗"——只是从来没人问过',
+      boundary: '你的边界在"别人的故事"和"自己的故事"之间。你允许所有人进入你的镜头，但你自己从来没有走到镜头中间过',
+      keyword: '「我拍过所有人的故事。我的那一页，还空着」' },
+    { id: 'cutafter', name: '被剪掉的那卷胶片', proto: [35, 30, 22, 12, 18],
+      line: '你最好的部分，从来不对外放映',
+      desc: '你有很多话没说出来，很多情绪没有表达，很多瞬间没有被记录。你把它们都收起来了，不是因为不重要，而是因为太重要了。你觉得有些东西一旦被别人看到，就变味了。所以你选择不说。你的人生像一卷被剪掉的胶片——最好的那一部分，只有你自己知道',
+      traits: ['有写日记或备忘录的习惯，但从不给别人看','有很多没发出去的消息，写了又删','在别人眼里你很好懂，但你知道那不是完整的你','比起说出来，你更愿意自己消化'],
+      mis: '别人觉得你"不够坦诚""藏着掖着"。其实你只是觉得，有些东西说出来就不纯粹了。你不是不信任别人，你只是太珍惜那些画面',
+      boundary: '你的边界在"说"和"不说"之间。你给自己留了很大一块私人领地，那里放着所有没有对外放映的胶片',
+      keyword: '「我把最好的那一段剪掉了。因为我不想让任何人看到它被误解的样子」' },
+    { id: 'montage', name: '循环配乐的蒙太奇', proto: [52, 62, 52, 85, 78],
+      line: '你的情绪按固定节拍流动，但观众已经猜到了下一个镜头',
+      desc: '你有一个很稳定的节奏。喜欢什么、讨厌什么、什么时候开心、什么时候低落，都有规律。你不喜欢意外，不喜欢被打乱。你的生活像一段循环播放的蒙太奇——配乐一直在响，画面一直在动，但你知道接下来会发生什么',
+      traits: ['习惯固定的作息，不喜欢被临时改变计划','歌单很久没换过了，但每一首都听不腻','情绪波动不大，不容易被外界影响','别人觉得你"稳"，但你自己偶尔会觉得有点闷'],
+      mis: '别人觉得你"无聊""太规律"。其实你只是喜欢这种可控的感觉。你知道什么时候会下雨，什么时候会放晴——这种确定性让你安心',
+      boundary: '你的边界在"计划"和"意外"之间。你欢迎一切在计划内的变化，但对计划外的突发状况，你会本能地想退回去',
+      keyword: '「我循环同一首歌，不是因为懒得换，是因为它刚好是我」' },
+    { id: 'chase', name: '无声的追逐戏', proto: [65, 82, 68, 5, 42],
+      line: '你一直在跑，但听不见自己的脚步声',
+      desc: '你很忙。学习、工作、社交、考试、实习、未来——你一直在往前跑，但很少停下来问自己：我在追什么？你习惯了这种节奏，习惯了在奔跑中寻找意义。但偶尔在深夜，你会突然停下来，发现自己听不见脚步声，也看不清方向',
+      traits: ['日程排得很满，闲下来反而不自在','常常同时做很多事，但很难专注一件事','害怕停下来，因为一停下来就会想很多','别人觉得你"很拼"，但你自己知道那不是拼，是逃'],
+      mis: '别人觉得你"目标明确""很有动力"。其实你只是不敢停。你怕停下来会发现，自己跑的方向可能不是自己想去的',
+      boundary: '你的边界在"忙碌"和"停下来"之间。你用忙碌把自己填满，这样就没有空间去面对那些被推迟的问题',
+      keyword: '「我不敢停。我怕一停下来，就再也跑不起来了」' },
+    { id: 'silhouette', name: '逆光里的剪影', proto: [55, 78, 62, 48, 72],
+      line: '别人只能看到你的轮廓，你自己也是',
+      desc: '你给人留下的印象很清晰——你很酷、很独立、很有想法。但那只是轮廓。你自己知道，轮廓里面的东西，你也没有完全看清过。你不习惯被仔细打量，也不习惯仔细打量自己。你宁愿站在逆光里，让别人看到一个干净的剪影，也不要被看清那些模糊的部分',
+      traits: ['在别人眼里很有个性，但你自己不确定那是不是真的你','不喜欢被问"你到底是什么样的人"','擅长给别人留下印象，但不擅长维持关系','偶尔会想"如果我是另一个人会怎样"'],
+      mis: '别人觉得你"很酷""很独立"。其实那只是逆光的效果。你也会迷茫，也会不确定，也会想被人看见——只是你习惯了站在光的那一边',
+      boundary: '你的边界在"轮廓"和"里面"之间。你允许所有人看到你的轮廓，但很少有人能走进轮廓里面——包括你自己',
+      keyword: '「你看到的我不是我。但我也说不清楚我是什么」' },
+    { id: 'nightcar', name: '慢速快门下的夜车', proto: [70, 80, 30, 62, 75],
+      line: '你的生活是一串模糊的光斑，看不清路，但一直在动',
+      desc: '你的生活节奏很快，但方向不太清楚。你从一个地方到另一个地方，从一段关系到另一段关系，从一个目标到另一个目标。你一直在动，但很少停下来。你的记忆是模糊的——你记得一些光斑，一些声音，一些瞬间，但它们连不起来',
+      traits: ['常常在深夜还在外面，不想回家','换过很多环境、很多圈子，但很难扎根','对"稳定"有一种矛盾的态度——想要，又怕','别人觉得你"漂泊"，但你觉得这就是你的节奏'],
+      mis: '别人觉得你"不稳定""不靠谱"。其实你只是不喜欢被固定。你需要空间，需要变化，需要一直在路上——这不是逃避，这是你的存在方式',
+      boundary: '你的边界在"动"和"停"之间。你可以停留在任何一段关系里，但你需要知道随时可以离开',
+      keyword: '「我一直在路上。不是因为找不到家，是因为路上就是我的家」' },
+    { id: 'empty', name: '空镜合集', proto: [40, 85, 58, 32, 48],
+      line: '你出现在很多人的电影里，但从来不是主角',
+      desc: '你有一种本事：让所有人都觉得你很亲切，但没有人真正靠近你。你是那种"认识很多人但没有深交"的人。你在每段关系里都表现得很得体，但你自己知道，那只是客串。你习惯了做一个"很好的人"，以至于忘了自己也可以有情绪、有需求、有不满',
+      traits: ['在人群中很受欢迎，但独处时会感到空','很少主动联系别人，但别人联系你时你一定会回','对自己的评价很低，觉得自己"没什么特别的"','习惯把自己的需求放在最后'],
+      mis: '别人觉得你"很好相处""没什么脾气"。其实你只是习惯了好相处。你也有脾气，也有想被照顾的时候——只是你从来不说',
+      boundary: '你的边界在"客串"和"主演"之间。你演了太多别人的电影，忘了自己也可以是主角',
+      keyword: '「我拍了很多空镜。但没有人问我，我拍这些的时候，在想什么」' },
+    { id: 'reshoot', name: '被重拍的结局', proto: [62, 72, 70, 65, 82],
+      line: '你总是在最后一刻改主意，然后把前面全部推翻',
+      desc: '你的人生有很多"重拍"。一段关系结束后你会想"如果当时我那样做"，一个选择做完后你会想"如果我选了另一个"。你不缺勇气，你缺的是"就这样吧"的笃定。你总觉得还有更好的版本——所以一遍遍地重来，一次次地推翻',
+      traits: ['常常在深夜回忆过去的选择，想象另一种可能','做决定前会反复权衡，做完后又反复后悔','不喜欢"就这样了"的感觉，总觉得还有机会改','别人觉得你"优柔寡断"，其实你只是太在意每一个选择'],
+      mis: '别人觉得你"不果断""想太多"。其实你只是想对得起每一个可能性。你不想错过那个"最好的版本"——哪怕那个版本可能根本不存在',
+      boundary: '你的边界在"这一版"和"下一版"之间。你允许自己不断重拍，但有时候你也需要学会一件事：有些结局，拍了就拍了',
+      keyword: '「我重拍了太多次。多到忘了第一版是什么样子」' },
+    { id: 'director', name: '导演剪辑版', proto: [55, 55, 55, 55, 55],
+      line: '你保留了所有素材，还没决定要剪成什么',
+      desc: '你不急着给自己下定义。你喜欢的东西很多，想尝试的事很多，人格的维度也很丰富。你不喜欢被归到任何一个类型里，因为你觉得那太窄了。你的人生像一盒还没剪的素材——所有的可能性都还在，你可以是任何样子',
+      traits: ['对很多事都感兴趣，但很难说最喜欢哪一个','不喜欢被贴标签，也不喜欢给别人贴标签','在不同的人面前可以呈现不同的自己，且都是真的','常常在"想要稳定"和"想要自由"之间摇摆'],
+      mis: '别人觉得你"没有重点""不够专注"。其实你只是不愿意为了一个标签，放弃其他所有的可能。你还在剪——剪成什么样，你自己也还不知道',
+      boundary: '你的边界是流动的，取决于你此刻在剪哪一段素材。这不是没有原则，这是你给自己留的最大的自由',
+      keyword: '「我还没剪完。也许永远都剪不完。但那又怎样？」' }
+  ];
+
+  const state = {
+    index: 0,
+    answers: new Array(QUESTIONS.length).fill(null),
+    animating: false
+  };
+
+  const els = {
+    screens: document.querySelectorAll('.screen'),
+    progressFill: document.getElementById('progressFill'),
+    qIndex: document.getElementById('qIndex'),
+    qNum: document.getElementById('qNum'),
+    qNum2: document.getElementById('qNum2'),
+    qText: document.getElementById('qText'),
+    options: document.getElementById('options'),
+    qcard: document.getElementById('qcard'),
+    backBtn: document.getElementById('backBtn'),
+    startBtn: document.getElementById('startBtn'),
+    retryBtn: document.getElementById('retryBtn'),
+    shareBtn: document.getElementById('shareBtn'),
+    radar: document.getElementById('radar'),
+    dims: document.getElementById('dims'),
+    resName: document.getElementById('resName'),
+    resLine: document.getElementById('resLine'),
+    resDesc: document.getElementById('resDesc'),
+    resTraits: document.getElementById('resTraits'),
+    resMis: document.getElementById('resMis'),
+    resBoundary: document.getElementById('resBoundary'),
+    resKeyword: document.getElementById('resKeyword'),
+    ticketNo: document.getElementById('ticketNo'),
+    ticketTime: document.getElementById('ticketTime'),
+    ticketSeat: document.getElementById('ticketSeat'),
+    ticket: document.getElementById('ticket'),
+    loadingText: document.getElementById('loadingText'),
+    toast: document.getElementById('toast'),
+    transitionMask: document.querySelector('.transition-mask'),
+    typewriter: document.querySelector('.typewriter-text')
+  };
+
+  function showScreen(id) {
+    els.screens.forEach(function (s) { s.classList.toggle('active', s.id === id); });
+    if (id === 'screen-result') {
+      document.body.classList.add('on-result');
+    } else {
+      document.body.classList.remove('on-result');
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function transitionTo(screenId, onSwitch, beforeDelay, afterDelay) {
+    var bd = beforeDelay === undefined ? 320 : beforeDelay;
+    var ad = afterDelay === undefined ? 60 : afterDelay;
+    els.transitionMask.classList.add('on');
+    setTimeout(function () {
+      showScreen(screenId);
+      if (onSwitch) onSwitch();
+      setTimeout(function () {
+        els.transitionMask.classList.remove('on');
+      }, ad);
+    }, bd);
+  }
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { els.toast.classList.remove('show'); }, 2000);
+  }
+
+  function typewriter(el, text, speed, onDone) {
+    el.textContent = '';
+    var i = 0;
+    function tick() {
+      if (i >= text.length) {
+        if (onDone) onDone();
+        return;
+      }
+      el.textContent = text.slice(0, i + 1);
+      i += 1;
+      setTimeout(tick, speed);
+    }
+    tick();
+  }
+
+  function renderQuestion(i) {
+    var q = QUESTIONS[i];
+    els.qIndex.textContent = pad2(i + 1);
+    els.qNum.textContent = pad2(i + 1);
+    els.qNum2.textContent = pad2(i + 1);
+    els.progressFill.style.width = ((i + 1) / QUESTIONS.length * 100) + '%';
+    els.options.innerHTML = '';
+    els.qText.textContent = '';
+
+    q.options.forEach(function (opt, idx) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'option';
+      btn.style.opacity = '0';
+      btn.style.transition = 'none';
+      if (state.answers[i] === idx) btn.classList.add('selected');
+
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+
+      var letter = document.createElement('span');
+      letter.className = 'letter';
+      letter.textContent = 'ABCD'[idx];
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'check');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M6 12.2 L10.3 16.5 L18 8');
+      svg.appendChild(path);
+
+      tag.appendChild(letter);
+      tag.appendChild(svg);
+
+      var txt = document.createElement('span');
+      txt.className = 'otext';
+      txt.textContent = opt.t;
+
+      btn.appendChild(tag);
+      btn.appendChild(txt);
+
+      btn.addEventListener('click', function () { chooseOption(idx, btn); });
+      els.options.appendChild(btn);
+    });
+
+    if (i > 0) els.backBtn.classList.add('show');
+    else els.backBtn.classList.remove('show');
+
+    typewriter(els.qText, q.text, 24, function () {
+      var opts = els.options.querySelectorAll('.option');
+      opts.forEach(function (o, k) {
+        setTimeout(function () {
+          o.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          o.style.opacity = '1';
+          o.style.transform = 'translateY(0)';
+        }, k * 80);
+      });
+    });
+  }
+
+  function chooseOption(optIdx, btn) {
+    if (state.animating) return;
+    state.answers[state.index] = optIdx;
+    btn.classList.add('selected');
+
+    if (navigator.vibrate) {
+      try { navigator.vibrate(8); } catch (e) {}
+    }
+
+    state.animating = true;
+
+    setTimeout(function () {
+      if (state.index < QUESTIONS.length - 1) {
+        state.index += 1;
+        transitionToNext();
+      } else {
+        goLoading();
+      }
+    }, 420);
+  }
+
+  function transitionToNext() {
+    var card = els.qcard;
+    card.classList.add('out');
+    setTimeout(function () {
+      renderQuestion(state.index);
+      card.classList.remove('out');
+      card.classList.add('pre');
+      void card.offsetWidth;
+      card.classList.remove('pre');
+      state.animating = false;
+    }, 400);
+  }
+
+  function goBack() {
+    if (state.animating || state.index === 0) return;
+    state.animating = true;
+    state.index -= 1;
+    transitionToNext();
+  }
+
+  function computeScores() {
+    var raw = [0, 0, 0, 0, 0];
+    for (var i = 0; i < QUESTIONS.length; i++) {
+      var ans = state.answers[i];
+      var opt = QUESTIONS[i].options[ans === null ? 0 : ans];
+      for (var d = 0; d < 5; d++) raw[d] += opt.v[d];
+    }
+    return raw.map(function (r) {
+      var pct = (r / MAX_PER_DIM) * 100;
+      return Math.round(Math.max(0, Math.min(100, pct)));
+    });
+  }
+
+  /* =========================================================
+     匹配算法 —— 导演剪辑版严格惩罚版
+     ========================================================= */
+  function matchType(scores) {
+    const norm = scores.map(function (s) { return s / 100; });
+
+    /* 用户分数分布的方差：衡量五个维度彼此之间有多接近
+       先算均值，再算各维度到均值的平方距离
+       这样无论分数整体偏高还是偏低，只要彼此接近就算均衡 */
+    let userMean = 0;
+    for (let d = 0; d < 5; d++) userMean += norm[d];
+    userMean = userMean / 5;
+
+    let userVariance = 0;
+    for (let d = 0; d < 5; d++) {
+      userVariance += Math.pow(norm[d] - userMean, 2);
+    }
+    userVariance = userVariance / 5;
+
+    const dimAvgs = [0, 0, 0, 0, 0];
+    TYPES.forEach(function (t) {
+      for (let d = 0; d < 5; d++) dimAvgs[d] += t.proto[d] / 100;
+    });
+    dimAvgs.forEach(function (a, d) { dimAvgs[d] = a / TYPES.length; });
+
+    let best = TYPES[0];
+    let bestScore = Infinity;
+
+    TYPES.forEach(function (type) {
+      const protoNorm = type.proto.map(function (p) { return p / 100; });
+
+      const devList = [];
+      for (let d = 0; d < 5; d++) {
+        devList.push({ d: d, dev: Math.abs(protoNorm[d] - dimAvgs[d]) });
+      }
+      devList.sort(function (a, b) { return b.dev - a.dev; });
+      const keyDims = [devList[0].d, devList[1].d];
+
+      let weightedDist = 0;
+      let weightSum = 0;
+      for (let d = 0; d < 5; d++) {
+        const deviation = Math.abs(protoNorm[d] - dimAvgs[d]);
+        let weight = 1 + deviation * 2.5;
+        if (keyDims.indexOf(d) !== -1) weight *= 2.5;
+        const diff = norm[d] - protoNorm[d];
+        weightedDist += weight * diff * diff;
+        weightSum += weight;
+      }
+      weightedDist = weightedDist / weightSum;
+
+      let protoVariance = 0;
+      for (let d = 0; d < 5; d++) {
+        protoVariance += Math.pow(protoNorm[d] - 0.5, 2);
+      }
+      protoVariance = protoVariance / 5;
+      const distinctionBonus = 1 - protoVariance * 0.2;
+
+      /* 导演剪辑版专属惩罚（严格版）：
+         只有五个维度完完全全均衡（方差 < 0.0002，约 ±1.5% 分散度）
+         才无惩罚地参与匹配。
+         0.0002 相当于 60 分制下五个维度全部落在 ±1 分以内。
+         只要有任何一点偏向，惩罚系数就会指数级上升，
+         让导演剪辑版迅速出局。 */
+      let specialPenalty = 1;
+      if (type.id === 'director') {
+        const excess = Math.max(0, userVariance - 0.0002);
+        specialPenalty = 1 + excess * 10000;
+      }
+
+      const finalScore = weightedDist * distinctionBonus * specialPenalty;
+      if (finalScore < bestScore) { bestScore = finalScore; best = type; }
+    });
+
+    return best;
+  }
+
+  function setupRadar(values, colors) {
+    var canvas = els.radar;
+    if (!canvas || !canvas.parentElement) return;
+
+    var dpr = window.devicePixelRatio || 1;
+    var wrapWidth = canvas.parentElement.clientWidth;
+    if (wrapWidth <= 0) wrapWidth = Math.min(window.innerWidth - 40, 480) - 40;
+
+    var size = Math.min(Math.max(wrapWidth, 200), 340);
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    canvas.width = Math.round(size * dpr);
+    canvas.height = Math.round(size * dpr);
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    animateRadar(ctx, size, values, colors);
+  }
+
+  function drawRadar(ctx, size, values, colors) {
+    ctx.clearRect(0, 0, size, size);
+    var cx = size / 2;
+    var cy = size / 2;
+    var R = size * 0.26;
+
+    var angles = [];
+    for (var i = 0; i < 5; i++) {
+      angles.push(-Math.PI / 2 + i * 2 * Math.PI / 5);
+    }
+
+    for (var ring = 1; ring <= 4; ring++) {
+      var r = R * ring / 4;
+      ctx.beginPath();
+      for (var i = 0; i < 5; i++) {
+        var x = cx + Math.cos(angles[i]) * r;
+        var y = cy + Math.sin(angles[i]) * r;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = ring === 4 ? 'rgba(245, 240, 230, 0.55)' : 'rgba(245, 240, 230, 0.14)';
+      ctx.lineWidth = ring === 4 ? 1.4 : 0.9;
+      ctx.stroke();
+    }
+
+    for (var i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angles[i]) * R, cy + Math.sin(angles[i]) * R);
+      ctx.strokeStyle = 'rgba(245, 240, 230, 0.20)';
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+    }
+
+    var pts = [];
+    for (var i = 0; i < 5; i++) {
+      var v = Math.max(0, Math.min(100, values[i])) / 100;
+      var r = R * v;
+      pts.push([cx + Math.cos(angles[i]) * r, cy + Math.sin(angles[i]) * r]);
+    }
+
+    ctx.beginPath();
+    for (var i = 0; i < 5; i++) {
+      if (i === 0) ctx.moveTo(pts[i][0], pts[i][1]);
+      else ctx.lineTo(pts[i][0], pts[i][1]);
+    }
+    ctx.closePath();
+    ctx.fillStyle = colors.fill;
+    ctx.fill();
+    ctx.strokeStyle = colors.accent;
+    ctx.lineWidth = 1.6;
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = colors.glow;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    for (var i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(pts[i][0], pts[i][1], 3.4, 0, Math.PI * 2);
+      ctx.fillStyle = '#F5F0E6';
+      ctx.fill();
+    }
+
+    ctx.font = '600 11.5px "Courier New", "PingFang SC", monospace';
+    ctx.fillStyle = 'rgba(245, 240, 230, 0.92)';
+    var labelR = R + 24;
+
+    for (var i = 0; i < 5; i++) {
+      var lx = cx + Math.cos(angles[i]) * labelR;
+      var ly = cy + Math.sin(angles[i]) * labelR;
+
+      if (Math.abs(Math.cos(angles[i])) < 0.3) {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = Math.sin(angles[i]) < 0 ? 'bottom' : 'top';
+      } else if (Math.cos(angles[i]) > 0) {
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+      } else {
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+      }
+      ctx.fillText(DIM_NAMES[i], lx, ly);
+    }
+  }
+
+  function animateRadar(ctx, size, target, colors) {
+    var duration = 900;
+    var start = performance.now();
+    function frame(now) {
+      var p = Math.min(1, (now - start) / duration);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var current = target.map(function (v) { return v * eased; });
+      drawRadar(ctx, size, current, colors);
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  var ticketObserver = null;
+
+  function renderResult() {
+    var scores = computeScores();
+    var type = matchType(scores);
+
+    applyTheme(type);
+
+    els.resName.textContent = '「' + type.name + '」';
+    els.resLine.textContent = type.line;
+    els.resDesc.textContent = type.desc;
+    els.resMis.textContent = type.mis;
+    els.resBoundary.textContent = type.boundary;
+    els.resKeyword.textContent = type.keyword;
+
+    var sum = scores.reduce(function (a, b) { return a + b; }, 0);
+    var no = String((sum * 37 + 1234) % 10000).padStart(4, '0');
+    els.ticketNo.textContent = 'No. ' + no;
+
+    var now = new Date();
+    var yyyy = now.getFullYear();
+    var mm = pad2(now.getMonth() + 1);
+    var dd = pad2(now.getDate());
+    var hh = pad2(now.getHours());
+    var mi = pad2(now.getMinutes());
+    els.ticketTime.textContent = yyyy + '.' + mm + '.' + dd + ' ' + hh + ':' + mi;
+
+    var row = (sum % 12) + 1;
+    var seat = ((sum * 7) % 20) + 1;
+    els.ticketSeat.textContent = row + ' 排 ' + seat + ' 座';
+
+    els.resTraits.innerHTML = '';
+    type.traits.forEach(function (t) {
+      var li = document.createElement('li');
+      li.textContent = t;
+      els.resTraits.appendChild(li);
+    });
+
+    els.dims.innerHTML = '';
+    DIM_NAMES.forEach(function (name, i) {
+      var rowEl = document.createElement('div');
+
+      var head = document.createElement('div');
+      head.className = 'dim-head';
+      var n1 = document.createElement('span');
+      n1.textContent = name;
+      var n2 = document.createElement('span');
+      n2.className = 'dim-val';
+      n2.textContent = scores[i];
+      head.appendChild(n1);
+      head.appendChild(n2);
+
+      var track = document.createElement('div');
+      track.className = 'dim-track';
+      var fill = document.createElement('div');
+      fill.className = 'dim-fill';
+      track.appendChild(fill);
+
+      rowEl.appendChild(head);
+      rowEl.appendChild(track);
+      els.dims.appendChild(rowEl);
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          fill.style.width = scores[i] + '%';
+        });
+      });
+    });
+
+    els.ticket.classList.remove('ticket-visible');
+    if (ticketObserver) ticketObserver.disconnect();
+    ticketObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('ticket-visible');
+          ticketObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    ticketObserver.observe(els.ticket);
+
+    setTimeout(function () {
+      var rect = els.ticket.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.9) {
+        els.ticket.classList.add('ticket-visible');
+      }
+    }, 400);
+
+    var colors = getRadarColors();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        setupRadar(scores, colors);
+      });
+    });
+  }
+
+  var loadingTexts = [
+    '正在冲洗你的胶片……',
+    '正在剪辑最后一场戏……',
+    '正在装片……'
+  ];
+
+  function goLoading() {
+    state.animating = true;
+    els.transitionMask.classList.add('on');
+
+    setTimeout(function () {
+      showScreen('screen-loading');
+      els.loadingText.textContent = loadingTexts[0];
+
+      setTimeout(function () { els.loadingText.textContent = loadingTexts[1]; }, 800);
+      setTimeout(function () { els.loadingText.textContent = loadingTexts[2]; }, 1600);
+
+      setTimeout(function () {
+        els.transitionMask.classList.remove('on');
+      }, 80);
+
+      setTimeout(function () {
+        renderResult();
+        showScreen('screen-result');
+        state.animating = false;
+      }, 2200);
+    }, 380);
+  }
+
+  function resetAll() {
+    state.index = 0;
+    state.answers = new Array(QUESTIONS.length).fill(null);
+    state.animating = false;
+    els.progressFill.style.width = '0%';
+    els.dims.innerHTML = '';
+    els.options.innerHTML = '';
+    els.qText.textContent = '';
+    els.resTraits.innerHTML = '';
+    els.typewriter.textContent = '';
+    els.ticket.classList.remove('ticket-visible');
+  }
+
+  function startQuiz() {
+    resetAll();
+
+    transitionTo('screen-typing', function () {
+      typewriter(els.typewriter, '请填写你的拍摄清单……', 80, function () {
+        setTimeout(function () {
+          transitionTo('screen-quiz', function () {
+            renderQuestion(0);
+          }, 380, 100);
+        }, 700);
+      });
+    });
+  }
+
+  function shareResult() {
+    var typeName = els.resName.textContent;
+    var typeLine = els.resLine.textContent;
+    var text = '我的导演人格是' + typeName + '\n' + typeLine +
+               '\n\n《人生如戏，你将如何导演？》\n' + location.href;
+
+    if (navigator.share) {
+      navigator.share({ title: '人生如戏，你将如何导演？', text: text }).catch(function () {});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast('已复制 · 去粘贴分享吧');
+      }).catch(function () { fallbackCopy(text); });
+      return;
+    }
+    fallbackCopy(text);
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showToast('已复制 · 去粘贴分享吧');
+    } catch (e) {
+      showToast('长按页面可手动复制');
+    }
+    document.body.removeChild(ta);
+  }
+
+  els.startBtn.addEventListener('click', startQuiz);
+  els.backBtn.addEventListener('click', goBack);
+  els.retryBtn.addEventListener('click', function () {
+    resetAll();
+    showScreen('screen-intro');
+  });
+  els.shareBtn.addEventListener('click', shareResult);
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    if (!document.getElementById('screen-result').classList.contains('active')) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      setupRadar(computeScores(), getRadarColors());
+    }, 220);
+  });
+
+})();
+</script>
+</body>
+</html>
